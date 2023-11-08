@@ -1,28 +1,34 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import time
 import pandas as pd
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
 
 # Function to scrape data and save to an Excel file
 def scrape_to_excel(driver, table_selector, excel_filename):
-    WebDriverWait(driver, 20).until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, table_selector))
-    )
-    table = driver.find_element(By.CSS_SELECTOR, table_selector)
-
-
-    headers = [header.text for header in table.find_elements(By.TAG_NAME, "th")]
-
-
-    data = [
-        [cell.text for cell in row.find_elements(By.TAG_NAME, "td")]
-        for row in table.find_elements(By.TAG_NAME, "tr")
-        if row.find_elements(By.TAG_NAME, "td")  # Exclude rows without data cells
-    ]
-    df = pd.DataFrame(data, columns=headers)
-    df.to_excel(excel_filename, index=False)
-    print(f'Data saved to {excel_filename}')
+    retry_count = 3  # Number of retries if a stale element exception occurs
+    while retry_count > 0:
+        try:
+            WebDriverWait(driver, 20).until(
+                EC.visibility_of_element_located((By.CSS_SELECTOR, table_selector))
+            )
+            table = driver.find_element(By.CSS_SELECTOR, table_selector)
+            headers = [header.text for header in table.find_elements(By.TAG_NAME, "th")]
+            data = [
+                [cell.text for cell in row.find_elements(By.TAG_NAME, "td")]
+                for row in table.find_elements(By.TAG_NAME, "tr")
+                if row.find_elements(By.TAG_NAME, "td")  # Exclude rows without data cells
+            ]
+            df = pd.DataFrame(data, columns=headers)
+            df.to_excel(excel_filename, index=False)
+            print(f'Data saved to {excel_filename}')
+            break
+        except StaleElementReferenceException:
+            retry_count -= 1
+            time.sleep(1)  # Wait a bit before retrying
 
 # Function to click on the navigation tab
 def click_nav_tab(driver, nav_tab_selector):
@@ -30,7 +36,7 @@ def click_nav_tab(driver, nav_tab_selector):
         EC.element_to_be_clickable((By.CSS_SELECTOR, nav_tab_selector))
     ).click()
 
-# function to scrape data
+# Function to scrape data
 def scrape_data(driver, url):
     try:
         # Open the website
