@@ -1,0 +1,5 @@
+# Ignore Excel files in any directory
+**/*.xlsx
+
+# Ignore logs directory
+logs/
