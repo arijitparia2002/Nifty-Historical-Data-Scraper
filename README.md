@@ -9,6 +9,7 @@ Before running this project, make sure you have the following installed:
 - Selenium
 - pandas
 - ChromeDriver (Make sure it matches the version of your Chrome browser)
+- Create a directory named `data` in the root directory
 
 It's recommended to use a virtual environment.
 
@@ -29,10 +30,10 @@ pip install -r requirements.txt
 
 ## Usage
 
-To run the scraper, simply execute the `scrape_data.py` script:
+To run the scraper, simply execute the `main.py` script:
 
 ```bash
-python scrape_data.py
+python main.py
 ```
 
 The script will generate three Excel files with the data:
@@ -42,7 +43,7 @@ The script will generate three Excel files with the data:
 
 ## Structure
 
-- `scrape_data.py`: Main script to run the scraper.
+- `main.py`: Main script to run the scraper.
 - `data/`: Directory where scraped data will be saved as Excel files.
 - `drivers/`: Directory containing the ChromeDriver executable.
 - `requirements.txt`: File containing the list of packages to install.
